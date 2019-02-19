@@ -6,5 +6,5 @@ package com.wx.adapter;
  **/
 public interface AC5 {
 
-    public int outputAC5();
+    int outputAC5();
 }
