@@ -57,7 +57,7 @@ Java开发中的23种设计模式详解(转)
 
 从这一块开始，我们详细介绍Java中23种设计模式的概念，应用场景等情况，并结合他们的特点及设计模式的原则进行分析。
 
-1、工厂方法模式（Factory Method）
+##1、工厂方法模式（Factory Method）
 
 工厂方法模式分为三种：
 
@@ -68,170 +68,182 @@ Java开发中的23种设计模式详解(转)
 首先，创建二者的共同接口：
 
 [java] view plaincopy
-public interface Sender {  
-    public void Send();  
-}  
+
+    public interface Sender {  
+        public void Send();  
+    }  
 其次，创建实现类：
 
 [java] view plaincopy
-public class MailSender implements Sender {  
-    @Override  
-    public void Send() {  
-        System.out.println("this is mailsender!");  
+
+    public class MailSender implements Sender {  
+        @Override  
+        public void Send() {  
+            System.out.println("this is mailsender!");  
+        }  
     }  
-}  
 [java] view plaincopy
-public class SmsSender implements Sender {  
-  
-    @Override  
-    public void Send() {  
-        System.out.println("this is sms sender!");  
+    
+    public class SmsSender implements Sender {  
+        @Override  
+        public void Send() {  
+            System.out.println("this is sms sender!");  
+        }  
     }  
-}  
 最后，建工厂类：
 
 [java] view plaincopy
-public class SendFactory {  
-  
-    public Sender produce(String type) {  
-        if ("mail".equals(type)) {  
-            return new MailSender();  
-        } else if ("sms".equals(type)) {  
-            return new SmsSender();  
-        } else {  
-            System.out.println("请输入正确的类型!");  
-            return null;  
+
+    public class SendFactory {  
+        public Sender produce(String type) {  
+            if ("mail".equals(type)) {  
+                return new MailSender();  
+            } else if ("sms".equals(type)) {  
+                return new SmsSender();  
+            } else {  
+                System.out.println("请输入正确的类型!");  
+                return null;  
+            }  
         }  
     }  
-}  
 我们来测试下：
 
-public class FactoryTest {  
-  
-    public static void main(String[] args) {  
-        SendFactory factory = new SendFactory();  
-        Sender sender = factory.produce("sms");  
-        sender.Send();  
+    public class FactoryTest {  
+        public static void main(String[] args) {  
+            SendFactory factory = new SendFactory();  
+            Sender sender = factory.produce("sms");  
+            sender.Send();  
+        }  
     }  
-}  
 输出：this is sms sender!
 
 22、多个工厂方法模式，是对普通工厂方法模式的改进，在普通工厂方法模式中，如果传递的字符串出错，则不能正确创建对象，而多个工厂方法模式是提供多个工厂方法，分别创建对象。关系图：
 
 将上面的代码做下修改，改动下SendFactory类就行，如下：
 
-[java] view plaincopypublic class SendFactory {  
-   public Sender produceMail(){  
-        return new MailSender();  
+[java] view plaincopy
+
+    public class SendFactory {  
+       public Sender produceMail(){  
+            return new MailSender();  
+        }  
+          
+        public Sender produceSms(){  
+            return new SmsSender();  
+        }  
     }  
-      
-    public Sender produceSms(){  
-        return new SmsSender();  
-    }  
-}  
 测试类如下：
 
 [java] view plaincopy
-public class FactoryTest {  
-  
-    public static void main(String[] args) {  
-        SendFactory factory = new SendFactory();  
-        Sender sender = factory.produceMail();  
-        sender.Send();  
+
+    public class FactoryTest {  
+        public static void main(String[] args) {  
+            SendFactory factory = new SendFactory();  
+            Sender sender = factory.produceMail();  
+            sender.Send();  
+        }  
     }  
-}  
+
 输出：this is mailsender!
 
 33、静态工厂方法模式，将上面的多个工厂方法模式里的方法置为静态的，不需要创建实例，直接调用即可。
 
 [java] view plaincopy
-public class SendFactory {  
-      
-    public static Sender produceMail(){  
-        return new MailSender();  
+
+    public class SendFactory {  
+        public static Sender produceMail(){  
+            return new MailSender();  
+        }  
+          
+        public static Sender produceSms(){  
+            return new SmsSender();  
+        }  
     }  
-      
-    public static Sender produceSms(){  
-        return new SmsSender();  
-    }  
-}  
+
 [java] view plaincopy
-public class FactoryTest {  
-  
-    public static void main(String[] args) {      
-        Sender sender = SendFactory.produceMail();  
-        sender.Send();  
+
+    public class FactoryTest {  
+        public static void main(String[] args) {      
+            Sender sender = SendFactory.produceMail();  
+            sender.Send();  
+        }  
     }  
-}  
 输出：this is mailsender!
 
 总体来说，工厂模式适合：凡是出现了大量的产品需要创建，并且具有共同的接口时，可以通过工厂方法模式进行创建。在以上的三种模式中，第一种如果传入的字符串有误，不能正确创建对象，第三种相对于第二种，不需要实例化工厂类，所以，大多数情况下，我们会选用第三种——静态工厂方法模式。
 
-2、抽象工厂模式（Abstract Factory）
+##2、抽象工厂模式（Abstract Factory）
 
 工厂方法模式有一个问题就是，类的创建依赖工厂类，也就是说，如果想要拓展程序，必须对工厂类进行修改，这违背了闭包原则，所以，从设计角度考虑，有一定的问题，如何解决？就用到抽象工厂模式，创建多个工厂类，这样一旦需要增加新的功能，直接增加新的工厂类就可以了，不需要修改之前的代码。因为抽象工厂不太好理解，我们先看看图，然后就和代码，就比较容易理解。
 
 请看例子：
 
 [java] view plaincopy
-public interface Sender {  
-    public void Send();  
-}  
+
+    public interface Sender {  
+        public void Send();  
+    }  
+
 两个实现类：
 
 [java] view plaincopy
-public class MailSender implements Sender {  
-    @Override  
-    public void Send() {  
-        System.out.println("this is mailsender!");  
+
+    public class MailSender implements Sender {  
+        @Override  
+        public void Send() {  
+            System.out.println("this is mailsender!");  
+        }  
     }  
-}  
 [java] view plaincopy
-public class SmsSender implements Sender {  
-  
-    @Override  
-    public void Send() {  
-        System.out.println("this is sms sender!");  
+
+    public class SmsSender implements Sender {  
+        @Override  
+        public void Send() {  
+            System.out.println("this is sms sender!");  
+        }  
     }  
-}  
+    
 两个工厂类：
 
 [java] view plaincopy
-public class SendMailFactory implements Provider {  
-      
-    @Override  
-    public Sender produce(){  
-        return new MailSender();  
+
+    public class SendMailFactory implements Provider {  
+        @Override  
+        public Sender produce(){  
+            return new MailSender();  
+        }  
     }  
-}  
 [java] view plaincopy
-public class SendSmsFactory implements Provider{  
-  
-    @Override  
-    public Sender produce() {  
-        return new SmsSender();  
+
+    public class SendSmsFactory implements Provider{  
+        @Override  
+        public Sender produce() {  
+            return new SmsSender();  
+        }  
     }  
-}  
 在提供一个接口：
 
 [java] view plaincopy
-public interface Provider {  
-    public Sender produce();  
-}  
+
+    public interface Provider {  
+        public Sender produce();  
+    }  
+    
 测试类：
 
 [java] view plaincopy
-public class Test {  
-  
-    public static void main(String[] args) {  
-        Provider provider = new SendMailFactory();  
-        Sender sender = provider.produce();  
-        sender.Send();  
+
+    public class Test {  
+        public static void main(String[] args) {  
+            Provider provider = new SendMailFactory();  
+            Sender sender = provider.produce();  
+            sender.Send();  
+        }  
     }  
-}  
+
 其实这个模式的好处就是，如果你现在想增加一个功能：发及时信息，则只需做一个实现类，实现Sender接口，同时做一个工厂类，实现Provider接口，就OK了，无需去改动现成的代码。这样做，拓展性较好！
 
-3、单例模式（Singleton）
+##3、单例模式（Singleton）
 
 单例对象（Singleton）是一种常用的设计模式。在Java应用中，单例对象能保证在一个JVM中，该对象只有一个实例存在。这样的模式有几个好处：
 
@@ -244,33 +256,35 @@ public class Test {
 首先我们写一个简单的单例类：
 
 [java] view plaincopy
-public class Singleton {  
-  
-    /* 持有私有静态实例，防止被引用，此处赋值为null，目的是实现延迟加载 */  
-    private static Singleton instance = null;  
-  
-    /* 私有构造方法，防止被实例化 */  
-    private Singleton() {  
-    }  
-  
-    /* 静态工程方法，创建实例 */  
-    public static Singleton getInstance() {  
-        if (instance == null) {  
-            instance = new Singleton();  
+
+    public class Singleton {  
+      
+        /* 持有私有静态实例，防止被引用，此处赋值为null，目的是实现延迟加载 */  
+        private static Singleton instance = null;  
+      
+        /* 私有构造方法，防止被实例化 */  
+        private Singleton() {  
         }  
-        return instance;  
+      
+        /* 静态工程方法，创建实例 */  
+        public static Singleton getInstance() {  
+            if (instance == null) {  
+                instance = new Singleton();  
+            }  
+            return instance;  
+        }  
+      
+        /* 如果该对象被用于序列化，可以保证对象在序列化前后保持一致 */  
+        public Object readResolve() {  
+            return instance;  
+        }  
     }  
-  
-    /* 如果该对象被用于序列化，可以保证对象在序列化前后保持一致 */  
-    public Object readResolve() {  
-        return instance;  
-    }  
-}  
 
 这个类可以满足基本要求，但是，像这样毫无线程安全保护的类，如果我们把它放入多线程的环境下，肯定就会出现问题了，如何解决？我们首先会想到对getInstance方法加synchronized关键字，如下：
 
 [java] view plaincopy
-public static synchronized Singleton getInstance() {  
+
+    public static synchronized Singleton getInstance() {  
         if (instance == null) {  
             instance = new Singleton();  
         }  
@@ -279,7 +293,8 @@ public static synchronized Singleton getInstance() {
 但是，synchronized关键字锁住的是这个对象，这样的用法，在性能上会有所下降，因为每次调用getInstance()，都要对对象上锁，事实上，只有在第一次创建对象的时候需要加锁，之后就不需要了，所以，这个地方需要改进。我们改成下面这个：
 
 [java] view plaincopy
-public static Singleton getInstance() {  
+
+    public static Singleton getInstance() {  
         if (instance == null) {  
             synchronized (instance) {  
                 if (instance == null) {  
@@ -289,6 +304,7 @@ public static Singleton getInstance() {
         }  
         return instance;  
     }  
+    
 似乎解决了之前提到的问题，将synchronized关键字加在了内部，也就是说当调用的时候是不需要加锁的，只有在instance为null，并创建对象的时候才需要加锁，性能有一定的提升。但是，这样的情况，还是有可能有问题的，看下面的情况：在Java指令中创建对象和赋值操作是分开进行的，也就是说instance = new Singleton();语句是分两步执行的。但是JVM并不保证这两个操作的先后顺序，也就是说有可能JVM会为新的Singleton实例分配空间，然后直接赋值给instance成员，然后再去初始化这个Singleton实例。这样就可能出错了，我们以A、B两个线程为例：
 
 a>A、B线程同时进入了第一个if判断
@@ -304,94 +320,113 @@ e>此时B线程打算使用Singleton实例，却发现它没有被初始化，�
 所以程序还是有可能发生错误，其实程序在运行过程是很复杂的，从这点我们就可以看出，尤其是在写多线程环境下的程序更有难度，有挑战性。我们对该程序做进一步优化：
 
 [java] view plaincopy
-private static class SingletonFactory{           
+
+    private static class SingletonFactory{           
         private static Singleton instance = new Singleton();           
     }           
     public static Singleton getInstance(){           
         return SingletonFactory.instance;           
     }   
+    
+    public class SingletonHolder {
+        private SingletonHolder(){}
+        
+        private static class SingletonBuilder {
+            private final static SingletonHolder INSTANCE = new SingletonHolder();
+        }
+        
+        public static SingletonHolder getInstance() {
+            return SingletonBuilder.INSTANCE;
+        }
+    }
+    
 实际情况是，单例模式使用内部类来维护单例的实现，JVM内部的机制能够保证当一个类被加载的时候，这个类的加载过程是线程互斥的。这样当我们第一次调用getInstance的时候，JVM能够帮我们保证instance只被创建一次，并且会保证把赋值给instance的内存初始化完毕，这样我们就不用担心上面的问题。同时该方法也只会在第一次调用的时候使用互斥机制，这样就解决了低性能问题。这样我们暂时总结一个完美的单例模式：
 
 [java] view plaincopy
-public class Singleton {  
-  
-    /* 私有构造方法，防止被实例化 */  
-    private Singleton() {  
+
+    public class Singleton {  
+      
+        /* 私有构造方法，防止被实例化 */  
+        private Singleton() {  
+        }  
+      
+        /* 此处使用一个内部类来维护单例 */  
+        private static class SingletonFactory {  
+            private static Singleton instance = new Singleton();  
+        }  
+      
+        /* 获取实例 */  
+        public static Singleton getInstance() {  
+            return SingletonFactory.instance;  
+        }  
+      
+        /* 如果该对象被用于序列化，可以保证对象在序列化前后保持一致 */  
+        public Object readResolve() {  
+            return getInstance();  
+        }  
     }  
-  
-    /* 此处使用一个内部类来维护单例 */  
-    private static class SingletonFactory {  
-        private static Singleton instance = new Singleton();  
-    }  
-  
-    /* 获取实例 */  
-    public static Singleton getInstance() {  
-        return SingletonFactory.instance;  
-    }  
-  
-    /* 如果该对象被用于序列化，可以保证对象在序列化前后保持一致 */  
-    public Object readResolve() {  
-        return getInstance();  
-    }  
-}  
+
 其实说它完美，也不一定，如果在构造函数中抛出异常，实例将永远得不到创建，也会出错。所以说，十分完美的东西是没有的，我们只能根据实际情况，选择最适合自己应用场景的实现方法。也有人这样实现：因为我们只需要在创建类的时候进行同步，所以只要将创建和getInstance()分开，单独为创建加synchronized关键字，也是可以的：
 
 [java] view plaincopy
-public class SingletonTest {  
-  
-    private static SingletonTest instance = null;  
-  
-    private SingletonTest() {  
-    }  
-  
-    private static synchronized void syncInit() {  
-        if (instance == null) {  
-            instance = new SingletonTest();  
+
+    public class SingletonTest {  
+      
+        private static SingletonTest instance = null;  
+      
+        private SingletonTest() {  
+        }  
+      
+        private static synchronized void syncInit() {  
+            if (instance == null) {  
+                instance = new SingletonTest();  
+            }  
+        }  
+      
+        public static SingletonTest getInstance() {  
+            if (instance == null) {  
+                syncInit();  
+            }  
+            return instance;  
         }  
     }  
-  
-    public static SingletonTest getInstance() {  
-        if (instance == null) {  
-            syncInit();  
-        }  
-        return instance;  
-    }  
-}  
+
 考虑性能的话，整个程序只需创建一次实例，所以性能也不会有什么影响。
 
 补充：采用"影子实例"的办法为单例对象的属性同步更新
 
 [java] view plaincopy
-public class SingletonTest {  
-  
-    private static SingletonTest instance = null;  
-    private Vector properties = null;  
-  
-    public Vector getProperties() {  
-        return properties;  
-    }  
-  
-    private SingletonTest() {  
-    }  
-  
-    private static synchronized void syncInit() {  
-        if (instance == null) {  
-            instance = new SingletonTest();  
+
+    public class SingletonTest {  
+      
+        private static SingletonTest instance = null;  
+        private Vector properties = null;  
+      
+        public Vector getProperties() {  
+            return properties;  
+        }  
+      
+        private SingletonTest() {  
+        }  
+      
+        private static synchronized void syncInit() {  
+            if (instance == null) {  
+                instance = new SingletonTest();  
+            }  
+        }  
+      
+        public static SingletonTest getInstance() {  
+            if (instance == null) {  
+                syncInit();  
+            }  
+            return instance;  
+        }  
+      
+        public void updateProperties() {  
+            SingletonTest shadow = new SingletonTest();  
+            properties = shadow.getProperties();  
         }  
     }  
-  
-    public static SingletonTest getInstance() {  
-        if (instance == null) {  
-            syncInit();  
-        }  
-        return instance;  
-    }  
-  
-    public void updateProperties() {  
-        SingletonTest shadow = new SingletonTest();  
-        properties = shadow.getProperties();  
-    }  
-}  
 通过单例模式的学习告诉我们：
 
 1、单例模式理解起来简单，但是具体实现起来还是有一定的难度。
@@ -408,7 +443,7 @@ public class SingletonTest {
 
 最后一点，单例类比较灵活，毕竟从实现上只是一个普通的Java类，只要满足单例的基本需求，你可以在里面随心所欲的实现一些其它功能，但是静态类不行。从上面这些概括中，基本可以看出二者的区别，但是，从另一方面讲，我们上面最后实现的那个单例模式，内部就是用一个静态类来实现的，所以，二者有很大的关联，只是我们考虑问题的层面不同罢了。两种思想的结合，才能造就出完美的解决方案，就像HashMap采用数组+链表来实现一样，其实生活中很多事情都是这样，单用不同的方法来处理问题，总是有优点也有缺点，最完美的方法是，结合各个方法的优点，才能最好的解决问题！
 
-4、建造者模式（Builder）
+##4、建造者模式（Builder）
 
 工厂类模式提供的是创建单个类的模式，而建造者模式则是将各种产品集中起来进行管理，用来创建复合对象，所谓复合对象就是指某个类具有不同的属性，其实建造者模式就是前面抽象工厂模式和最后的Test结合起来得到的。我们看一下代码：
 
@@ -416,22 +451,21 @@ public class SingletonTest {
 
 [java] view plaincopy
 
-public class Builder {  
-      
-    private List<Sender> list = new ArrayList<Sender>();  
-      
-    public void produceMailSender(int count){  
-        for(int i=0; i<count; i++){  
-            list.add(new MailSender());  
+    public class Builder {  
+        private List<Sender> list = new ArrayList<Sender>();  
+          
+        public void produceMailSender(int count){  
+            for(int i=0; i<count; i++){  
+                list.add(new MailSender());  
+            }  
         }  
-    }  
-      
-    public void produceSmsSender(int count){  
-        for(int i=0; i<count; i++){  
-            list.add(new SmsSender());  
+        public void produceSmsSender(int count){  
+            for(int i=0; i<count; i++){  
+                list.add(new SmsSender());  
+            }  
         }  
-    }  
-}  
+    }
+    
 测试类：
 
 [java] view plaincopy
@@ -444,18 +478,19 @@ public class Test {
 }  
 从这点看出，建造者模式将很多功能集成到一个类里，这个类可以创造出比较复杂的东西。所以与工程模式的区别就是：工厂模式关注的是创建单个产品，而建造者模式则关注创建符合对象，多个部分。因此，是选择工厂模式还是建造者模式，依实际情况而定。
 
-5、原型模式（Prototype）
+##5、原型模式（Prototype）
 
 原型模式虽然是创建型的模式，但是与工程模式没有关系，从名字即可看出，该模式的思想就是将一个对象作为原型，对其进行复制、克隆，产生一个和原对象类似的新对象。本小结会通过对象的复制，进行讲解。在Java中，复制对象是通过clone()实现的，先创建一个原型类：
 
 [java] view plaincopy
-public class Prototype implements Cloneable {  
-  
-    public Object clone() throws CloneNotSupportedException {  
-        Prototype proto = (Prototype) super.clone();  
-        return proto;  
-    }  
-}  
+
+    public class Prototype implements Cloneable {  
+        public Object clone() throws CloneNotSupportedException {  
+            Prototype proto = (Prototype) super.clone();  
+            return proto;  
+        }  
+    }
+      
 很简单，一个原型类，只需要实现Cloneable接口，覆写clone方法，此处clone方法可以改成任意的名称，因为Cloneable接口是个空接口，你可以任意定义实现类的方法名，如cloneA或者cloneB，因为此处的重点是super.clone()这句话，super.clone()调用的是Object的clone()方法，而在Object类中，clone()是native的，具体怎么实现，我会在另一篇文章中，关于解读Java中本地方法的调用，此处不再深究。在这儿，我将结合对象的浅复制和深复制来说一下，首先需要了解对象深、浅复制的概念：
 
 浅复制：将一个对象复制后，基本数据类型的变量都会重新创建，而引用类型，指向的还是原对象所指向的。
@@ -465,98 +500,103 @@ public class Prototype implements Cloneable {
 此处，写一个深浅复制的例子：
 
 [java] view plaincopy
-public class Prototype implements Cloneable, Serializable {  
-  
-    private static final long serialVersionUID = 1L;  
-    private String string;  
-  
-    private SerializableObject obj;  
-  
-    /* 浅复制 */  
-    public Object clone() throws CloneNotSupportedException {  
-        Prototype proto = (Prototype) super.clone();  
-        return proto;  
+
+    public class Prototype implements Cloneable, Serializable {  
+      
+        private static final long serialVersionUID = 1L;  
+        private String string;  
+      
+        private SerializableObject obj;  
+      
+        /* 浅复制 */  
+        public Object clone() throws CloneNotSupportedException {  
+            Prototype proto = (Prototype) super.clone();  
+            return proto;  
+        }  
+      
+        /* 深复制 */  
+        public Object deepClone() throws IOException, ClassNotFoundException {  
+      
+            /* 写入当前对象的二进制流 */  
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();  
+            ObjectOutputStream oos = new ObjectOutputStream(bos);  
+            oos.writeObject(this);  
+      
+            /* 读出二进制流产生的新对象 */  
+            ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());  
+            ObjectInputStream ois = new ObjectInputStream(bis);  
+            return ois.readObject();  
+        }  
+      
+        public String getString() {  
+            return string;  
+        }  
+      
+        public void setString(String string) {  
+            this.string = string;  
+        }  
+      
+        public SerializableObject getObj() {  
+            return obj;  
+        }  
+      
+        public void setObj(SerializableObject obj) {  
+            this.obj = obj;  
+        }  
+      
     }  
-  
-    /* 深复制 */  
-    public Object deepClone() throws IOException, ClassNotFoundException {  
-  
-        /* 写入当前对象的二进制流 */  
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();  
-        ObjectOutputStream oos = new ObjectOutputStream(bos);  
-        oos.writeObject(this);  
-  
-        /* 读出二进制流产生的新对象 */  
-        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());  
-        ObjectInputStream ois = new ObjectInputStream(bis);  
-        return ois.readObject();  
+      
+    class SerializableObject implements Serializable {  
+        private static final long serialVersionUID = 1L;  
     }  
-  
-    public String getString() {  
-        return string;  
-    }  
-  
-    public void setString(String string) {  
-        this.string = string;  
-    }  
-  
-    public SerializableObject getObj() {  
-        return obj;  
-    }  
-  
-    public void setObj(SerializableObject obj) {  
-        this.obj = obj;  
-    }  
-  
-}  
-  
-class SerializableObject implements Serializable {  
-    private static final long serialVersionUID = 1L;  
-}  
  
 要实现深复制，需要采用流的形式读入当前对象的二进制输入，再写出二进制数据对应的对象。
 我们接着讨论设计模式，上篇文章我讲完了5种创建型模式，这章开始，我将讲下7种结构型模式：适配器模式、装饰模式、代理模式、外观模式、桥接模式、组合模式、享元模式。其中对象的适配器模式是各种模式的起源，我们看下面的图：
 
- #适配器模式
+##6. 适配器模式
  将某个类的接口转换成客户端期望的另一个接口表示，目的是消除由于接口不匹配所造成的类的兼容性问题。主要分为三类：类的适配器模式、对象的适配器模式、接口的适配器模式。首先，我们来看看类的适配器模式，先看类图：
 
 核心思想就是：有一个Source类，拥有一个方法，待适配，目标接口时Targetable，通过Adapter类，将Source的功能扩展到Targetable里，看代码：
 
 [java] view plaincopy
-public class Source {  
-  
-    public void method1() {  
-        System.out.println("this is original method!");  
+
+    public class Source {  
+        public void method1() {  
+            System.out.println("this is original method!");  
+        }  
     }  
-}  
 [java] view plaincopy
-public interface Targetable {  
-  
-    /* 与原类中的方法相同 */  
-    public void method1();  
-  
-    /* 新类的方法 */  
-    public void method2();  
-}  
-[java] view plaincopy
-public class Adapter extends Source implements Targetable {  
-  
-    @Override  
-    public void method2() {  
-        System.out.println("this is the targetable method!");  
+
+    public interface Targetable {  
+        /* 与原类中的方法相同 */  
+        public void method1();  
+      
+        /* 新类的方法 */  
+        public void method2();  
     }  
-}  
+[java] view plaincopy
+
+    public class Adapter extends Source implements Targetable {  
+      
+        @Override  
+        public void method2() {  
+            System.out.println("this is the targetable method!");  
+        }  
+    }  
+
 Adapter类继承Source类，实现Targetable接口，下面是测试类：
 
 [java] view plaincopy
-public class AdapterTest {  
-  
-    public static void main(String[] args) {  
-        Targetable target = new Adapter();  
-        target.method1();  
-        target.method2();  
+
+    public class AdapterTest {  
+      
+        public static void main(String[] args) {  
+            Targetable target = new Adapter();  
+            target.method1();  
+            target.method2();  
+        }  
     }  
-}  
+
 输出：
 
 this is original method!
@@ -573,24 +613,25 @@ this is the targetable method!
 只需要修改Adapter类的源码即可：
 
 [java] view plaincopy
-public class Wrapper implements Targetable {  
-  
-    private Source source;  
+
+    public class Wrapper implements Targetable {  
       
-    public Wrapper(Source source){  
-        super();  
-        this.source = source;  
+        private Source source;  
+          
+        public Wrapper(Source source){  
+            super();  
+            this.source = source;  
+        }  
+        @Override  
+        public void method2() {  
+            System.out.println("this is the targetable method!");  
+        }  
+      
+        @Override  
+        public void method1() {  
+            source.method1();  
+        }  
     }  
-    @Override  
-    public void method2() {  
-        System.out.println("this is the targetable method!");  
-    }  
-  
-    @Override  
-    public void method1() {  
-        source.method1();  
-    }  
-}  
 测试类：
 
 [java] view plaincopy
@@ -669,51 +710,53 @@ the sourceable interface's second Sub2!
 
 接口的适配器模式：当不希望实现一个接口中所有的方法时，可以创建一个抽象类Wrapper，实现所有方法，我们写别的类的时候，继承抽象类即可。
 
-7、装饰模式（Decorator）
+##7、装饰模式（Decorator）
 
 顾名思义，装饰模式就是给一个对象增加一些新的功能，而且是动态的，要求装饰对象和被装饰对象实现同一个接口，装饰对象持有被装饰对象的实例，关系图如下：
 
 Source类是被装饰类，Decorator类是一个装饰类，可以为Source类动态的添加一些功能，代码如下：
 
 [java] view plaincopy
-public interface Sourceable {  
-    public void method();  
-}  
+
+    public interface Sourceable {  
+        public void method();  
+    }  
 [java] view plaincopy
-public class Source implements Sourceable {  
-  
-    @Override  
-    public void method() {  
-        System.out.println("the original method!");  
+
+    public class Source implements Sourceable {  
+        @Override  
+        public void method() {  
+            System.out.println("the original method!");  
+        }  
     }  
-}  
 [java] view plaincopy
-public class Decorator implements Sourceable {  
-  
-    private Sourceable source;  
-      
-    public Decorator(Sourceable source){  
-        super();  
-        this.source = source;  
+
+    public class Decorator implements Sourceable {  
+        private Sourceable source;  
+          
+        public Decorator(Sourceable source){  
+            super();  
+            this.source = source;  
+        }  
+        @Override  
+        public void method() {  
+            System.out.println("before decorator!");  
+            source.method();  
+            System.out.println("after decorator!");  
+        }  
     }  
-    @Override  
-    public void method() {  
-        System.out.println("before decorator!");  
-        source.method();  
-        System.out.println("after decorator!");  
-    }  
-}  
 测试类：
 
 [java] view plaincopy
-public class DecoratorTest {  
-  
-    public static void main(String[] args) {  
-        Sourceable source = new Source();  
-        Sourceable obj = new Decorator(source);  
-        obj.method();  
+
+    public class DecoratorTest {  
+        public static void main(String[] args) {  
+            Sourceable source = new Source();  
+            Sourceable obj = new Decorator(source);  
+            obj.method();  
+        }  
     }  
-}  
+
 输出：
 
 before decorator!
@@ -728,59 +771,61 @@ after decorator!
 
 缺点：产生过多相似的对象，不易排错！
 
-8、代理模式（Proxy）
+##8、代理模式（Proxy）
 
-其实每个模式名称就表明了该模式的作用，代理模式就是多一个代理类出来，替原对象进行一些操作，比如我们在租房子的时候回去找中介，为什么呢？因为你对该地区房屋的信息掌握的不够全面，希望找一个更熟悉的人去帮你做，此处的代理就是这个意思。再如我们有的时候打官司，我们需要请律师，因为律师在法律方面有专长，可以替我们进行操作，表达我们的想法。先来看看关系图：
- 
+其实每个模式名称就表明了该模式的作用，代理模式就是多一个代理类出来，替原对象进行一些操作，比如我们在租房子的时候回去找中介，为什么呢？因为你对该地区房屋的信息掌握的不够全面，希望找一个更熟悉的人去帮你做，此处的代理就是这个意思。再如我们有的时候打官司，我们需要请律师，因为律师在法律方面有专长，可以替我们进行操作，表达我们的想法。先来看看关系图： 
 
 根据上文的阐述，代理模式就比较容易的理解了，我们看下代码：
 
 [java] view plaincopy
-public interface Sourceable {  
-    public void method();  
-}  
+
+    public interface Sourceable {  
+        public void method();  
+    }
+      
 [java] view plaincopy
-public class Source implements Sourceable {  
-  
-    @Override  
-    public void method() {  
-        System.out.println("the original method!");  
-    }  
-}  
+
+    public class Source implements Sourceable {  
+        @Override  
+        public void method() {  
+            System.out.println("the original method!");  
+        }  
+    }
+      
 [java] view plaincopy
-public class Proxy implements Sourceable {  
-  
-    private Source source;  
-    public Proxy(){  
-        super();  
-        this.source = new Source();  
-    }  
-    @Override  
-    public void method() {  
-        before();  
-        source.method();  
-        atfer();  
-    }  
-    private void atfer() {  
-        System.out.println("after proxy!");  
-    }  
-    private void before() {  
-        System.out.println("before proxy!");  
-    }  
-}  
+
+    public class Proxy implements Sourceable {  
+        private Source source;  
+        public Proxy(){  
+            super();  
+            this.source = new Source();  
+        }  
+        @Override  
+        public void method() {  
+            before();  
+            source.method();  
+            atfer();  
+        }  
+        private void atfer() {  
+            System.out.println("after proxy!");  
+        }  
+        private void before() {  
+            System.out.println("before proxy!");  
+        }  
+    }
+      
 测试类：
 
 [java] view plaincopy
-public class ProxyTest {  
-  
-    public static void main(String[] args) {  
-        Sourceable source = new Proxy();  
-        source.method();  
-    }  
-  
-}  
-输出：
 
+    public class ProxyTest {  
+        public static void main(String[] args) {  
+            Sourceable source = new Proxy();  
+            source.method();  
+        }  
+    }  
+
+输出：
 before proxy!
 the original method!
 after proxy!
@@ -795,86 +840,89 @@ after proxy!
 
 使用代理模式，可以将功能划分的更加清晰，有助于后期维护！
 
-9、外观模式（Facade）
+##9、外观模式（Facade）
 
 外观模式是为了解决类与类之家的依赖关系的，像spring一样，可以将类和类之间的关系配置到配置文件中，而外观模式就是将他们的关系放在一个Facade类中，降低了类类之间的耦合度，该模式中没有涉及到接口，看下类图：（我们以一个计算机的启动过程为例）
 
 我们先看下实现类：
 
 [java] view plaincopy
-public class CPU {  
-      
-    public void startup(){  
-        System.out.println("cpu startup!");  
+
+    public class CPU {  
+        public void startup(){  
+            System.out.println("cpu startup!");  
+        }  
+          
+        public void shutdown(){  
+            System.out.println("cpu shutdown!");  
+        }  
     }  
-      
-    public void shutdown(){  
-        System.out.println("cpu shutdown!");  
-    }  
-}  
+    
 [java] view plaincopy
-public class Memory {  
-      
-    public void startup(){  
-        System.out.println("memory startup!");  
+
+    public class Memory {  
+        public void startup(){  
+            System.out.println("memory startup!");  
+        }  
+          
+        public void shutdown(){  
+            System.out.println("memory shutdown!");  
+        }  
     }  
-      
-    public void shutdown(){  
-        System.out.println("memory shutdown!");  
-    }  
-}  
 [java] view plaincopy
-public class Disk {  
-      
-    public void startup(){  
-        System.out.println("disk startup!");  
+
+    public class Disk {  
+        public void startup(){  
+            System.out.println("disk startup!");  
+        }  
+          
+        public void shutdown(){  
+            System.out.println("disk shutdown!");  
+        }  
     }  
-      
-    public void shutdown(){  
-        System.out.println("disk shutdown!");  
-    }  
-}  
 [java] view plaincopy
-public class Computer {  
-    private CPU cpu;  
-    private Memory memory;  
-    private Disk disk;  
-      
-    public Computer(){  
-        cpu = new CPU();  
-        memory = new Memory();  
-        disk = new Disk();  
+
+    public class Computer {  
+        private CPU cpu;  
+        private Memory memory;  
+        private Disk disk;  
+          
+        public Computer(){  
+            cpu = new CPU();  
+            memory = new Memory();  
+            disk = new Disk();  
+        }  
+          
+        public void startup(){  
+            System.out.println("start the computer!");  
+            cpu.startup();  
+            memory.startup();  
+            disk.startup();  
+            System.out.println("start computer finished!");  
+        }  
+          
+        public void shutdown(){  
+            System.out.println("begin to close the computer!");  
+            cpu.shutdown();  
+            memory.shutdown();  
+            disk.shutdown();  
+            System.out.println("computer closed!");  
+        }  
     }  
-      
-    public void startup(){  
-        System.out.println("start the computer!");  
-        cpu.startup();  
-        memory.startup();  
-        disk.startup();  
-        System.out.println("start computer finished!");  
-    }  
-      
-    public void shutdown(){  
-        System.out.println("begin to close the computer!");  
-        cpu.shutdown();  
-        memory.shutdown();  
-        disk.shutdown();  
-        System.out.println("computer closed!");  
-    }  
-}  
+
 User类如下：
 
 [java] view plaincopy
-public class User {  
-  
-    public static void main(String[] args) {  
-        Computer computer = new Computer();  
-        computer.startup();  
-        computer.shutdown();  
-    }  
-}  
-输出：
 
+    public class User {  
+        public static void main(String[] args) {  
+            Computer computer = new Computer();  
+            computer.startup();  
+            computer.shutdown();  
+        }  
+    }  
+
+输出：
 start the computer!
 cpu startup!
 memory startup!
