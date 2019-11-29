@@ -1308,9 +1308,9 @@ FlyWeightFactory负责创建和管理享元单元，当一个客户端请求时�
 
 先来张图，看看这11中模式的关系：
 
-第一类：通过父类与子类的关系进行实现。第二类：两个类之间。第三类：类的状态。第四类：通过中间类
+####第一类：通过父类与子类的关系进行实现。第二类：两个类之间。第三类：类的状态。第四类：通过中间类
 
-13、策略模式（strategy）
+##13、策略模式（strategy）
 
 策略模式定义了一系列算法，并将每个算法封装起来，使他们可以相互替换，且算法的变化不会影响到使用算法的客户。需要设计一个接口，为一系列实现类提供统一的方法，多个实现类实现该接口，设计一个抽象类（可有可无，属于辅助类），提供辅助函数，关系图如下：
 
@@ -1320,69 +1320,77 @@ AbstractCalculator是辅助类，提供辅助方法，接下来，依次实现�
 首先统一接口：
 
 [java] view plaincopy
-public interface ICalculator {  
-    public int calculate(String exp);  
-}  
+
+    public interface ICalculator {  
+        public int calculate(String exp);  
+    }  
+
 辅助类：
 
 [java] view plaincopy
-public abstract class AbstractCalculator {  
-      
-    public int[] split(String exp,String opt){  
-        String array[] = exp.split(opt);  
-        int arrayInt[] = new int[2];  
-        arrayInt[0] = Integer.parseInt(array[0]);  
-        arrayInt[1] = Integer.parseInt(array[1]);  
-        return arrayInt;  
+
+    public abstract class AbstractCalculator {  
+        public int[] split(String exp,String opt){  
+            String array[] = exp.split(opt);  
+            int arrayInt[] = new int[2];  
+            arrayInt[0] = Integer.parseInt(array[0]);  
+            arrayInt[1] = Integer.parseInt(array[1]);  
+            return arrayInt;  
+        }  
     }  
-}  
+
 三个实现类：
 
 [java] view plaincopy
-public class Plus extends AbstractCalculator implements ICalculator {  
-  
-    @Override  
-    public int calculate(String exp) {  
-        int arrayInt[] = split(exp,"\\+");  
-        return arrayInt[0]+arrayInt[1];  
+
+    public class Plus extends AbstractCalculator implements ICalculator {  
+      
+        @Override  
+        public int calculate(String exp) {  
+            int arrayInt[] = split(exp,"\\+");  
+            return arrayInt[0]+arrayInt[1];  
+        }  
     }  
-}  
+
 [java] view plaincopy
-public class Minus extends AbstractCalculator implements ICalculator {  
-  
-    @Override  
-    public int calculate(String exp) {  
-        int arrayInt[] = split(exp,"-");  
-        return arrayInt[0]-arrayInt[1];  
+
+    public class Minus extends AbstractCalculator implements ICalculator {  
+      
+        @Override  
+        public int calculate(String exp) {  
+            int arrayInt[] = split(exp,"-");  
+            return arrayInt[0]-arrayInt[1];  
+        }  
+      
     }  
-  
-}  
+
 [java] view plaincopy
-public class Multiply extends AbstractCalculator implements ICalculator {  
-  
-    @Override  
-    public int calculate(String exp) {  
-        int arrayInt[] = split(exp,"\\*");  
-        return arrayInt[0]*arrayInt[1];  
+
+    public class Multiply extends AbstractCalculator implements ICalculator {  
+        @Override  
+        public int calculate(String exp) {  
+            int arrayInt[] = split(exp,"\\*");  
+            return arrayInt[0]*arrayInt[1];  
+        }  
     }  
-}  
 简单的测试类：
 
 [java] view plaincopy
-public class StrategyTest {  
-  
-    public static void main(String[] args) {  
-        String exp = "2+8";  
-        ICalculator cal = new Plus();  
-        int result = cal.calculate(exp);  
-        System.out.println(result);  
+
+    public class StrategyTest {  
+        public static void main(String[] args) {  
+            String exp = "2+8";  
+            ICalculator cal = new Plus();  
+            int result = cal.calculate(exp);  
+            System.out.println(result);  
+        }  
     }  
-}  
+
 输出：10
 
 策略模式的决定权在用户，系统本身提供不同算法的实现，新增或者删除算法，对各种算法做封装。因此，策略模式多用在算法决策系统中，外部用户只需要决定用哪个算法即可。
 
-14、模板方法模式（Template Method）
+##14、模板方法模式（Template Method）
 
 解释一下模板方法模式，就是指：一个抽象类中，有一个主方法，再定义1...n个方法，可以是抽象的，也可以是实际的方法，定义一个类，继承该抽象类，重写抽象方法，通过调用抽象类，实现对子类的调用，先看个关系图：
 
@@ -1411,25 +1419,29 @@ public class StrategyTest {
     }  
     
 [java] view plaincopy
-public class Plus extends AbstractCalculator {  
-  
-    @Override  
-    public int calculate(int num1,int num2) {  
-        return num1 + num2;  
+
+    public class Plus extends AbstractCalculator {  
+      
+        @Override  
+        public int calculate(int num1,int num2) {  
+            return num1 + num2;  
+        }  
     }  
-}  
+
 测试类：
 
 [java] view plaincopy
-public class StrategyTest {  
-  
-    public static void main(String[] args) {  
-        String exp = "8+8";  
-        AbstractCalculator cal = new Plus();  
-        int result = cal.calculate(exp, "\\+");  
-        System.out.println(result);  
+
+    public class StrategyTest {  
+      
+        public static void main(String[] args) {  
+            String exp = "8+8";  
+            AbstractCalculator cal = new Plus();  
+            int result = cal.calculate(exp, "\\+");  
+            System.out.println(result);  
+        }  
     }  
-}  
+
 我跟踪下这个小程序的执行过程：首先将exp和"\\+"做参数，调用AbstractCalculator类里的calculate(String,String)方法，在calculate(String,String)里调用同类的split()，之后再调用calculate(int ,int)方法，从这个方法进入到子类中，执行完return num1 + num2后，将值返回到AbstractCalculator类，赋给result，打印出来。正好验证了我们开头的思路。
 
 15、观察者模式（Observer）
