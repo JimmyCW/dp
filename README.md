@@ -1031,69 +1031,216 @@ this is the second sub!
 直接来看代码：
 
 [java] view plaincopy
-public class TreeNode {  
-      
-    private String name;  
-    private TreeNode parent;  
-    private Vector<TreeNode> children = new Vector<TreeNode>();  
-      
-    public TreeNode(String name){  
-        this.name = name;  
-    }  
-  
-    public String getName() {  
-        return name;  
-    }  
-  
-    public void setName(String name) {  
-        this.name = name;  
-    }  
-  
-    public TreeNode getParent() {  
-        return parent;  
-    }  
-  
-    public void setParent(TreeNode parent) {  
-        this.parent = parent;  
-    }  
-      
-    //添加孩子节点  
-    public void add(TreeNode node){  
-        children.add(node);  
-    }  
-      
-    //删除孩子节点  
-    public void remove(TreeNode node){  
-        children.remove(node);  
-    }  
-      
-    //取得孩子节点  
-    public Enumeration<TreeNode> getChildren(){  
-        return children.elements();  
-    }  
-}  
-[java] view plaincopy
-public class Tree {  
-  
-    TreeNode root = null;  
-  
-    public Tree(String name) {  
-        root = new TreeNode(name);  
-    }  
-  
-    public static void main(String[] args) {  
-        Tree tree = new Tree("A");  
-        TreeNode nodeB = new TreeNode("B");  
-        TreeNode nodeC = new TreeNode("C");  
+
+    public class TreeNode {  
           
-        nodeB.add(nodeC);  
-        tree.root.add(nodeB);  
-        System.out.println("build the tree finished!");  
+        private String name;  
+        private TreeNode parent;  
+        private Vector<TreeNode> children = new Vector<TreeNode>();  
+          
+        public TreeNode(String name){  
+            this.name = name;  
+        }  
+      
+        public String getName() {  
+            return name;  
+        }  
+      
+        public void setName(String name) {  
+            this.name = name;  
+        }  
+      
+        public TreeNode getParent() {  
+            return parent;  
+        }  
+      
+        public void setParent(TreeNode parent) {  
+            this.parent = parent;  
+        }  
+          
+        //添加孩子节点  
+        public void add(TreeNode node){  
+            children.add(node);  
+        }  
+          
+        //删除孩子节点  
+        public void remove(TreeNode node){  
+            children.remove(node);  
+        }  
+          
+        //取得孩子节点  
+        public Enumeration<TreeNode> getChildren(){  
+            return children.elements();  
+        }  
     }  
-}  
+
+[java] view plaincopy
+
+    public class Tree {  
+        TreeNode root = null;  
+      
+        public Tree(String name) {  
+            root = new TreeNode(name);  
+        }  
+      
+        public static void main(String[] args) {  
+            Tree tree = new Tree("A");  
+            TreeNode nodeB = new TreeNode("B");  
+            TreeNode nodeC = new TreeNode("C");  
+              
+            nodeB.add(nodeC);  
+            tree.root.add(nodeB);  
+            System.out.println("build the tree finished!");  
+        }  
+    }  
+
 使用场景：将多个对象组合在一起进行操作，常用于表示树形结构中，例如二叉树，数等。
 
-12、享元模式（Flyweight）
+##12、享元模式（Flyweight）
+
+----
+###一、什么是享元模式
+　　说到享元模式，第一个想到的应该就是池技术了，String常量池、数据库连接池、缓冲池等等都是享元模式的应用，所以说享元模式是池技术的重要实现方式。
+
+　　比如我们每次创建字符串对象时，都需要创建一个新的字符串对象的话，内存开销会很大，所以如果第一次创建了字符串对象“adam“，下次再创建相同的字符串”adam“时，只是把它的引用指向”adam“，这样就实现了”adam“字符串再内存中的共享。
+
+　　举个最简单的例子，网络联机下棋的时候，一台服务器连接了多个客户端（玩家），如果我们每个棋子都要创建对象，那一盘棋可能就有上百个对象产生，玩家多点的话，因为内存空间有限，一台服务器就难以支持了，所以这里要使用享元模式，将棋子对象减少到几个实例。下面给出享元模式的定义。
+
+　　享元模式（Flyweight），运用共享技术有效地支持大量细粒度的对象。UML结构图如下：
+ ![image](https://images2018.cnblogs.com/blog/1018770/201805/1018770-20180521224951802-1630441597.png)
+ 　其中，Flyweight是抽象享元角色。它是产品的抽象类，同时定义出对象的外部状态和内部状态（外部状态及内部状态相关内容见后方）的接口或实现；ConcreteFlyweight是具体享元角色，是具体的产品类，实现抽象角色定义的业务；UnsharedConcreteFlyweight是不可共享的享元角色，一般不会出现在享元工厂中；FlyweightFactory是享元工厂，它用于构造一个池容器，同时提供从池中获得对象的方法。
+ 
+####1. Flyweight抽象类
+
+ 　　所有具体享元类的超类或接口，通过这个接口，Flyweight可以接受并作用于外部状态。
+    
+    public abstract class Flyweight {
+    
+        //内部状态
+        public String intrinsic;
+        //外部状态
+        protected final String extrinsic;
+        
+        //要求享元角色必须接受外部状态
+        public Flyweight(String extrinsic) {
+            this.extrinsic = extrinsic;
+        }
+        
+        //定义业务操作
+        public abstract void operate(int extrinsic);
+    
+        public String getIntrinsic() {
+            return intrinsic;
+        }
+    
+        public void setIntrinsic(String intrinsic) {
+            this.intrinsic = intrinsic;
+        }
+    }
+
+####2. ConcreteFlyweight类
+　　继承Flyweight超类或实现Flyweight接口，并为其内部状态增加存储空间。
+
+    public class ConcreteFlyweight extends Flyweight {
+    
+        //接受外部状态
+        public ConcreteFlyweight(String extrinsic) {
+            super(extrinsic);
+        }
+    
+        //根据外部状态进行逻辑处理
+        @Override
+        public void operate(int extrinsic) {
+            System.out.println("具体Flyweight:" + extrinsic);
+        }
+    
+    }
+    
+####3. UnsharedConcreteFlyweight类
+　　指那些不需要共享的Flyweight子类。
+   
+    public class UnsharedConcreteFlyweight extends Flyweight {
+       public UnsharedConcreteFlyweight(String extrinsic) {
+           super(extrinsic);
+       }
+       @Override
+       public void operate(int extrinsic) {
+           System.out.println("不共享的具体Flyweight:" + extrinsic);
+       } 
+    }
+
+####4. FlyweightFactory类
+一个享元工厂，用来创建并管理Flyweight对象，主要是用来确保合理地共享Flyweight，当用户请求一个Flyweight时，FlyweightFactory对象提供一个已创建的实例或创建一个实例。
+
+    public class FlyweightFactory {
+    
+        //定义一个池容器
+        private static HashMap<String, Flyweight> pool = new HashMap<>();
+        
+        //享元工厂
+        public static Flyweight getFlyweight(String extrinsic) {
+            Flyweight flyweight = null;
+            
+            if(pool.containsKey(extrinsic)) {    //池中有该对象
+                flyweight = pool.get(extrinsic);
+                System.out.print("已有 " + extrinsic + " 直接从池中取---->");
+            } else {
+                //根据外部状态创建享元对象
+                flyweight = new ConcreteFlyweight(extrinsic);
+                //放入池中
+                pool.put(extrinsic, flyweight);
+                System.out.print("创建 " + extrinsic + " 并从池中取出---->");
+            }
+            
+            return flyweight;
+        }
+    }
+    
+####5. Client客户端
+
+    public class Client {
+        public static void main(String[] args) {
+            int extrinsic = 22;
+            
+            Flyweight flyweightX = FlyweightFactory.getFlyweight("X");
+            flyweightX.operate(++ extrinsic);
+            
+            Flyweight flyweightY = FlyweightFactory.getFlyweight("Y");
+            flyweightY.operate(++ extrinsic);
+            
+            Flyweight flyweightZ = FlyweightFactory.getFlyweight("Z");
+            flyweightZ.operate(++ extrinsic);
+            
+            Flyweight flyweightReX = FlyweightFactory.getFlyweight("X");
+            flyweightReX.operate(++ extrinsic);
+            
+            Flyweight unsharedFlyweight = new UnsharedConcreteFlyweight("X");
+            unsharedFlyweight.operate(++ extrinsic);
+        }
+        
+    }
+    
+运行结果如下：
+
+![image](https://images2018.cnblogs.com/blog/1018770/201805/1018770-20180521232254245-1985727778.png)
+   
+从这个结果我们可以看出来，第一次创建X、Y、Z时，都是先创建再从池中取出，而第二次创建X时，因为池中已经存在了，所以直接从池中取出，这就是享元模式。
+
+
+###二、内部状态和外部状态
+
+   　　上面享元模式的定义为我们提出了两个要求：细粒度和共享对象。我们知道分配太多的对象到应用程序中将有损程序的性能，同时还容易造成内存溢出，要避免这种情况，用到的就是共享技术，这里就需要提到内部状态和外部状态了。
+   
+   　　因为要求细粒度对象，所以不可避免地会使对象数量多且性质相近，此时我们就将这些对象的信息分为两个部分：内部状态和外部状态。
+   
+   　　内部状态指对象共享出来的信息，存储在享元对象内部并且不会随环境的改变而改变；外部状态指对象得以依赖的一个标记，是随环境改变而改变的、不可共享的状态。
+   
+   　　我们举一个最简单的例子，棋牌类游戏大家都有玩过吧，比如说说围棋和跳棋，它们都有大量的棋子对象，围棋和五子棋只有黑白两色，跳棋颜色略多一点，但也是不太变化的，所以棋子颜色就是棋子的内部状态；而各个棋子之间的差别就是位置的不同，我们落子嘛，落子颜色是定的，但位置是变化的，所以方位坐标就是棋子的外部状态。
+   
+   　　那么为什么这里要用享元模式呢？可以想象一下，上面提到的棋类游戏的例子，比如围棋，理论上有361个空位可以放棋子，常规情况下每盘棋都有可能有两三百个棋子对象产生，因为内存空间有限，一台服务器很难支持更多的玩家玩围棋游戏，如果用享元模式来处理棋子，那么棋子对象就可以减少到只有两个实例，这样就很好的解决了对象的开销问题。
+
+----
+
 
 享元模式的主要目的是实现对象的共享，即共享池，当系统中对象多的时候可以减少内存的开销，通常与工厂模式一起使用。
 
@@ -1104,53 +1251,53 @@ FlyWeightFactory负责创建和管理享元单元，当一个客户端请求时�
 看下数据库连接池的代码：
 
 [java] view plaincopy
-public class ConnectionPool {  
+
+    public class ConnectionPool {  
+        private Vector<Connection> pool;  
+          
+        /*公有属性*/  
+        private String url = "jdbc:mysql://localhost:3306/test";  
+        private String username = "root";  
+        private String password = "root";  
+        private String driverClassName = "com.mysql.jdbc.Driver";  
       
-    private Vector<Connection> pool;  
+        private int poolSize = 100;  
+        private static ConnectionPool instance = null;  
+        Connection conn = null;  
       
-    /*公有属性*/  
-    private String url = "jdbc:mysql://localhost:3306/test";  
-    private String username = "root";  
-    private String password = "root";  
-    private String driverClassName = "com.mysql.jdbc.Driver";  
-  
-    private int poolSize = 100;  
-    private static ConnectionPool instance = null;  
-    Connection conn = null;  
-  
-    /*构造方法，做一些初始化工作*/  
-    private ConnectionPool() {  
-        pool = new Vector<Connection>(poolSize);  
-  
-        for (int i = 0; i < poolSize; i++) {  
-            try {  
-                Class.forName(driverClassName);  
-                conn = DriverManager.getConnection(url, username, password);  
-                pool.add(conn);  
-            } catch (ClassNotFoundException e) {  
-                e.printStackTrace();  
-            } catch (SQLException e) {  
-                e.printStackTrace();  
+        /*构造方法，做一些初始化工作*/  
+        private ConnectionPool() {  
+            pool = new Vector<Connection>(poolSize);  
+      
+            for (int i = 0; i < poolSize; i++) {  
+                try {  
+                    Class.forName(driverClassName);  
+                    conn = DriverManager.getConnection(url, username, password);  
+                    pool.add(conn);  
+                } catch (ClassNotFoundException e) {  
+                    e.printStackTrace();  
+                } catch (SQLException e) {  
+                    e.printStackTrace();  
+                }  
+            }  
+        }  
+      
+        /* 返回连接到连接池 */  
+        public synchronized void release() {  
+            pool.add(conn);  
+        }  
+      
+        /* 返回连接池中的一个数据库连接 */  
+        public synchronized Connection getConnection() {  
+            if (pool.size() > 0) {  
+                Connection conn = pool.get(0);  
+                pool.remove(conn);  
+                return conn;  
+            } else {  
+                return null;  
             }  
         }  
     }  
-  
-    /* 返回连接到连接池 */  
-    public synchronized void release() {  
-        pool.add(conn);  
-    }  
-  
-    /* 返回连接池中的一个数据库连接 */  
-    public synchronized Connection getConnection() {  
-        if (pool.size() > 0) {  
-            Connection conn = pool.get(0);  
-            pool.remove(conn);  
-            return conn;  
-        } else {  
-            return null;  
-        }  
-    }  
-}  
  
 通过连接池的管理，实现了数据库连接的共享，不需要每一次都重新创建连接，节省了数据库重新创建的开销，提升了系统的性能！本章讲解了7种结构型模式，因为篇幅的问题，剩下的11种行为型模式，
 本章是关于设计模式的最后一讲，会讲到第三种设计模式——行为型模式，共11种：策略模式、模板方法模式、观察者模式、迭代子模式、责任链模式、命令模式、备忘录模式、状态模式、访问者模式、中介者模式、解释器模式。这段时间一直在写关于设计模式的东西，终于写到一半了，写博文是个很费时间的东西，因为我得为读者负责，不论是图还是代码还是表述，都希望能尽量写清楚，以便读者理解，我想不论是我还是读者，都希望看到高质量的博文出来，从我本人出发，我会一直坚持下去，不断更新，源源动力来自于读者朋友们的不断支持，我会尽自己的努力，写好每一篇文章！希望大家能不断给出意见和建议，共同打造完美的博文！
