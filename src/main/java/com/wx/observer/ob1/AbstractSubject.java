@@ -5,7 +5,6 @@ import java.util.List;
 
 public abstract class AbstractSubject implements Subject {
     List<Observer> list = new ArrayList<>();
-
     private int value = 0;
 
     @Override
