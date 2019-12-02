@@ -1,4 +1,4 @@
-package com.wx.observer;
+package com.wx.observer.ob;
 
 import java.util.Optional;
 

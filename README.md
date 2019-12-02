@@ -1433,7 +1433,6 @@ AbstractCalculator是辅助类，提供辅助方法，接下来，依次实现�
 [java] view plaincopy
 
     public class StrategyTest {  
-      
         public static void main(String[] args) {  
             String exp = "8+8";  
             AbstractCalculator cal = new Plus();  
@@ -1448,97 +1447,103 @@ AbstractCalculator是辅助类，提供辅助方法，接下来，依次实现�
 
 包括这个模式在内的接下来的四个模式，都是类和类之间的关系，不涉及到继承，学的时候应该 记得归纳，记得本文最开始的那个图。观察者模式很好理解，类似于邮件订阅和RSS订阅，当我们浏览一些博客或wiki时，经常会看到RSS图标，就这的意思是，当你订阅了该文章，如果后续有更新，会及时通知你。其实，简单来讲就一句话：当一个对象变化时，其它依赖该对象的对象都会收到通知，并且随着变化！对象之间是一种一对多的关系。先来看看关系图：
 
+ ![image](https://img-my.csdn.net/uploads/201211/30/1354285683_8317.PNG)
+
 我解释下这些类的作用：MySubject类就是我们的主对象，Observer1和Observer2是依赖于MySubject的对象，当MySubject变化时，Observer1和Observer2必然变化。AbstractSubject类中定义着需要监控的对象列表，可以对其进行修改：增加或删除被监控对象，且当MySubject变化时，负责通知在列表内存在的对象。我们看实现代码：
 
 一个Observer接口：
 
 [java] view plaincopy
-public interface Observer {  
-    public void update();  
-}  
+
+    public interface Observer {  
+        public void update();  
+    }  
+
 两个实现类：
 
 [java] view plaincopy
-public class Observer1 implements Observer {  
-  
-    @Override  
-    public void update() {  
-        System.out.println("observer1 has received!");  
+
+    public class Observer1 implements Observer {  
+        @Override  
+        public void update() {  
+            System.out.println("observer1 has received!");  
+        }  
     }  
-}  
+
 [java] view plaincopy
-public class Observer2 implements Observer {  
-  
-    @Override  
-    public void update() {  
-        System.out.println("observer2 has received!");  
+
+    public class Observer2 implements Observer {  
+        @Override  
+        public void update() {  
+            System.out.println("observer2 has received!");  
+        }  
     }  
-  
-}  
+
 Subject接口及实现类：
 
 [java] view plaincopy
-public interface Subject {  
-      
-    /*增加观察者*/  
-    public void add(Observer observer);  
-      
-    /*删除观察者*/  
-    public void del(Observer observer);  
-      
-    /*通知所有的观察者*/  
-    public void notifyObservers();  
-      
-    /*自身的操作*/  
-    public void operation();  
-}  
+
+    public interface Subject {  
+        /*增加观察者*/  
+        public void add(Observer observer);  
+          
+        /*删除观察者*/  
+        public void del(Observer observer);  
+          
+        /*通知所有的观察者*/  
+        public void notifyObservers();  
+          
+        /*自身的操作*/  
+        public void operation();  
+    }  
+
 [java] view plaincopy
-public abstract class AbstractSubject implements Subject {  
-  
-    private Vector<Observer> vector = new Vector<Observer>();  
-    @Override  
-    public void add(Observer observer) {  
-        vector.add(observer);  
-    }  
-  
-    @Override  
-    public void del(Observer observer) {  
-        vector.remove(observer);  
-    }  
-  
-    @Override  
-    public void notifyObservers() {  
-        Enumeration<Observer> enumo = vector.elements();  
-        while(enumo.hasMoreElements()){  
-            enumo.nextElement().update();  
+
+    public abstract class AbstractSubject implements Subject {  
+        private Vector<Observer> vector = new Vector<Observer>();  
+        @Override  
+        public void add(Observer observer) {  
+            vector.add(observer);  
+        }  
+      
+        @Override  
+        public void del(Observer observer) {  
+            vector.remove(observer);  
+        }  
+      
+        @Override  
+        public void notifyObservers() {  
+            Enumeration<Observer> enumo = vector.elements();  
+            while(enumo.hasMoreElements()){  
+                enumo.nextElement().update();  
+            }  
         }  
     }  
-}  
 [java] view plaincopy
-public class MySubject extends AbstractSubject {  
-  
-    @Override  
-    public void operation() {  
-        System.out.println("update self!");  
-        notifyObservers();  
+
+    public class MySubject extends AbstractSubject {  
+        @Override  
+        public void operation() {  
+            System.out.println("update self!");  
+            notifyObservers();  
+        }  
+      
     }  
-  
-}  
 
 测试类：
-
 [java] view plaincopy
-public class ObserverTest {  
-  
-    public static void main(String[] args) {  
-        Subject sub = new MySubject();  
-        sub.add(new Observer1());  
-        sub.add(new Observer2());  
-          
-        sub.operation();  
+
+    public class ObserverTest {  
+        public static void main(String[] args) {  
+            Subject sub = new MySubject();  
+            sub.add(new Observer1());  
+            sub.add(new Observer2());  
+              
+            sub.operation();  
+        }  
+      
     }  
-  
-}  
+
 输出：
 
 update self!
@@ -1557,105 +1562,110 @@ observer2 has received!
 两个接口：
 
 [java] view plaincopy
-public interface Collection {  
-      
-    public Iterator iterator();  
-      
-    /*取得集合元素*/  
-    public Object get(int i);  
-      
-    /*取得集合大小*/  
-    public int size();  
-}  
+
+    public interface Collection {  
+          
+        public Iterator iterator();  
+          
+        /*取得集合元素*/  
+        public Object get(int i);  
+          
+        /*取得集合大小*/  
+        public int size();  
+    }  
 [java] view plaincopy
-public interface Iterator {  
-    //前移  
-    public Object previous();  
-      
-    //后移  
-    public Object next();  
-    public boolean hasNext();  
-      
-    //取得第一个元素  
-    public Object first();  
-}  
+
+    public interface Iterator {  
+        //前移  
+        public Object previous();  
+          
+        //后移  
+        public Object next();  
+        public boolean hasNext();  
+          
+        //取得第一个元素  
+        public Object first();  
+    }  
 两个实现：
 
 [java] view plaincopy
-public class MyCollection implements Collection {  
-  
-    public String string[] = {"A","B","C","D","E"};  
-    @Override  
-    public Iterator iterator() {  
-        return new MyIterator(this);  
+
+    public class MyCollection implements Collection {  
+      
+        public String string[] = {"A","B","C","D","E"};  
+        @Override  
+        public Iterator iterator() {  
+            return new MyIterator(this);  
+        }  
+      
+        @Override  
+        public Object get(int i) {  
+            return string[i];  
+        }  
+      
+        @Override  
+        public int size() {  
+            return string.length;  
+        }  
     }  
-  
-    @Override  
-    public Object get(int i) {  
-        return string[i];  
-    }  
-  
-    @Override  
-    public int size() {  
-        return string.length;  
-    }  
-}  
 [java] view plaincopy
-public class MyIterator implements Iterator {  
-  
-    private Collection collection;  
-    private int pos = -1;  
+
+    public class MyIterator implements Iterator {  
       
-    public MyIterator(Collection collection){  
-        this.collection = collection;  
-    }  
+        private Collection collection;  
+        private int pos = -1;  
+          
+        public MyIterator(Collection collection){  
+            this.collection = collection;  
+        }  
+          
+        @Override  
+        public Object previous() {  
+            if(pos > 0){  
+                pos--;  
+            }  
+            return collection.get(pos);  
+        }  
       
-    @Override  
-    public Object previous() {  
-        if(pos > 0){  
-            pos--;  
+        @Override  
+        public Object next() {  
+            if(pos<collection.size()-1){  
+                pos++;  
+            }  
+            return collection.get(pos);  
         }  
-        return collection.get(pos);  
-    }  
-  
-    @Override  
-    public Object next() {  
-        if(pos<collection.size()-1){  
-            pos++;  
+      
+        @Override  
+        public boolean hasNext() {  
+            if(pos<collection.size()-1){  
+                return true;  
+            }else{  
+                return false;  
+            }  
         }  
-        return collection.get(pos);  
-    }  
-  
-    @Override  
-    public boolean hasNext() {  
-        if(pos<collection.size()-1){  
-            return true;  
-        }else{  
-            return false;  
+      
+        @Override  
+        public Object first() {  
+            pos = 0;  
+            return collection.get(pos);  
         }  
+      
     }  
-  
-    @Override  
-    public Object first() {  
-        pos = 0;  
-        return collection.get(pos);  
-    }  
-  
-}  
 测试类：
 
 [java] view plaincopy
-public class Test {  
-  
-    public static void main(String[] args) {  
-        Collection collection = new MyCollection();  
-        Iterator it = collection.iterator();  
-          
-        while(it.hasNext()){  
-            System.out.println(it.next());  
+
+    public class Test {  
+      
+        public static void main(String[] args) {  
+            Collection collection = new MyCollection();  
+            Iterator it = collection.iterator();  
+              
+            while(it.hasNext()){  
+                System.out.println(it.next());  
+            }  
         }  
     }  
-}  
 输出：A B C D E
 
 此处我们貌似模拟了一个集合类的过程，感觉是不是很爽？其实JDK中各个类也都是这些基本的东西，加一些设计模式，再加一些优化放到一起的，只要我们把这些东西学会了，掌握好了，我们也可以写出自己的集合类，甚至框架！
